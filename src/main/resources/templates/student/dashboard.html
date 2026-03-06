@@ -1,0 +1,185 @@
+
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mon Bulletin — UniFlex</title>
+    <link rel="stylesheet" th:href="@{/css/student.css}">
+</head>
+<body>
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="logo">U</div>
+            <div>
+                <div class="brand-name">UniFlex</div>
+                <div class="brand-sub">Espace Étudiant</div>
+            </div>
+        </div>
+
+        <div class="menu-title">Navigation</div>
+        <a class="nav-link active" href="#"><span class="nav-icon">📊</span> Mon Bulletin</a>
+        <a class="nav-link" href="#"><span class="nav-icon">📚</span> Mes Matières</a>
+        <a class="nav-link" href="#"><span class="nav-icon">👤</span> Mon Profil</a>
+
+        <div class="sidebar-spacer"></div>
+
+        <form th:action="@{/logout}" method="post" class="logout">
+            <button type="submit">⬅ Déconnexion</button>
+        </form>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="topbar-title">Mon Bulletin</div>
+                <div class="topbar-sub" th:text="${student.classGroup.academicYear}">2025-2026</div>
+            </div>
+            <div class="topbar-right">
+                <div class="user-avatar"
+                     th:text="${#strings.substring(student.firstName,0,1)+#strings.substring(student.lastName,0,1)}">JD</div>
+                <div class="user-name" th:text="${student.firstName+' '+student.lastName}">Jean Dupont</div>
+            </div>
+        </header>
+
+        <!-- CONTENT -->
+        <section class="content">
+
+            <!-- Bannière étudiant -->
+            <div class="student-banner">
+                <div class="banner-left">
+                    <div class="banner-avatar"
+                         th:text="${#strings.substring(student.firstName,0,1)}">J</div>
+                    <div>
+                        <div class="banner-name"
+                             th:text="${student.firstName+' '+student.lastName}">Jean Dupont</div>
+                        <div class="banner-meta"
+                             th:text="${student.classGroup.name+' · '+student.classGroup.academicYear}">L3 INFO A</div>
+                    </div>
+                </div>
+                <div class="banner-code" th:text="${student.code}">UF-2026-001</div>
+            </div>
+
+            <!-- 3 cartes KPI -->
+            <div class="kpi-grid">
+
+                <div class="kpi-card">
+                    <div class="kpi-label">Moyenne Générale</div>
+                    <div class="kpi-value"
+                         th:text="${#numbers.formatDecimal(moyenne,1,2)}">0.00</div>
+                    <span class="mention-chip"
+                          th:classappend="${mention=='ÉCHEC'?'mc-fail':
+                                  mention=='PASSABLE'?'mc-pass':
+                                  mention=='ASSEZ BIEN'?'mc-ab':
+                                  mention=='BIEN'?'mc-bien':'mc-tbien'}"
+                          th:text="${mention}">BIEN</span>
+                </div>
+
+                <div class="kpi-card green">
+                    <div class="kpi-label">Moyenne Semestre 1</div>
+                    <div class="kpi-value"
+                         th:text="${#numbers.formatDecimal(moyenneS1,1,2)}">0.00</div>
+                    <div class="kpi-sub"
+                         th:text="${nbGradesS1+' matière(s)'}">0 matière(s)</div>
+                </div>
+
+                <div class="kpi-card orange">
+                    <div class="kpi-label">Moyenne Semestre 2</div>
+                    <div class="kpi-value"
+                         th:text="${#numbers.formatDecimal(moyenneS2,1,2)}">0.00</div>
+                    <div class="kpi-sub"
+                         th:text="${nbGradesS2+' matière(s)'}">0 matière(s)</div>
+                </div>
+
+            </div>
+
+            <!-- Tableau des notes -->
+            <div class="section-header">
+                <div class="section-title">Détail des notes</div>
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="showTerm('S1',this)">Semestre 1</button>
+                    <button class="tab-btn"        onclick="showTerm('S2',this)">Semestre 2</button>
+                    <button class="tab-btn"        onclick="showTerm('ALL',this)">Tout</button>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Matière</th>
+                        <th>Professeur</th>
+                        <th>Coef.</th>
+                        <th>Semestre</th>
+                        <th>Note /20</th>
+                    </tr>
+                    </thead>
+                    <tbody id="gradeBody">
+                    <tr th:each="g : ${grades}"
+                        th:data-term="${g.term}"
+                        th:style="${g.term=='S2'?'display:none':''}">
+                        <td>
+                            <div class="td-main" th:text="${g.subject.name}">Java</div>
+                        </td>
+                        <td th:text="${g.subject.teacher.firstName+' '+g.subject.teacher.lastName}">Prof</td>
+                        <td>
+                <span class="coef"
+                      th:text="${g.subject.coefficient}">2</span>
+                        </td>
+                        <td th:text="${g.term}">S1</td>
+                        <td>
+                <span class="note-chip"
+                      th:classappend="${g.value<10?'note-fail':g.value<12?'note-medium':'note-pass'}"
+                      th:text="${#numbers.formatDecimal(g.value,1,2)}">14.00</span>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(grades)}">
+                        <td colspan="5" class="empty-cell">Aucune note disponible.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Récap bas -->
+            <div class="avg-row">
+                <div class="avg-card">
+                    <div>
+                        <div class="avg-label">Semestre 1</div>
+                        <div class="avg-value"
+                             th:text="${#numbers.formatDecimal(moyenneS1,1,2)}">0.00</div>
+                    </div>
+                    <div class="avg-ring"
+                         th:classappend="${moyenneS1>=10?'green':''}">S1</div>
+                </div>
+                <div class="avg-card">
+                    <div>
+                        <div class="avg-label">Semestre 2</div>
+                        <div class="avg-value"
+                             th:text="${#numbers.formatDecimal(moyenneS2,1,2)}">0.00</div>
+                    </div>
+                    <div class="avg-ring"
+                         th:classappend="${moyenneS2>=10?'green':''}">S2</div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+</div>
+
+<script>
+    function showTerm(term, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('#gradeBody tr[data-term]').forEach(row => {
+        row.style.display = (term === 'ALL' || row.dataset.term === term) ? '' : 'none';
+      });
+    }
+</script>
+</body>
+</html>

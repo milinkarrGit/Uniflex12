@@ -1,0 +1,175 @@
+
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Professeurs — UniFlex Admin</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-top">
+            <div class="brand">
+                <div class="logo">UF</div>
+                <div>
+                    <div class="brand-name">UniFlex</div>
+                    <div class="brand-sub">Administration</div>
+                </div>
+            </div>
+            <div class="admin-badge">Admin</div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Principal</div>
+                <a class="nav-link" th:href="@{/admin/dashboard}">
+                    <span class="nav-icon">📊</span> Dashboard
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Gestion</div>
+                <a class="nav-link active" th:href="@{/admin/teachers}">
+                    <span class="nav-icon">👨‍🏫</span> Professeurs
+                </a>
+                <a class="nav-link" th:href="@{/admin/students}">
+                    <span class="nav-icon">👨‍🎓</span> Étudiants
+                </a>
+                <a class="nav-link" th:href="@{/admin/classes}">
+                    <span class="nav-icon">🏫</span> Classes
+                </a>
+                <a class="nav-link" th:href="@{/admin/subjects}">
+                    <span class="nav-icon">📚</span> Matières
+                </a>
+                <a class="nav-link" th:href="@{/admin/grades}">
+                    <span class="nav-icon">📝</span> Notes
+                </a>
+            </div>
+        </nav>
+        <div class="sidebar-bottom">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="logout-btn">⬅ Déconnexion</button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="topbar-title">Professeurs</div>
+                <div class="topbar-breadcrumb">Administration · Gestion des professeurs</div>
+            </div>
+            <div class="topbar-right">
+                <div class="admin-avatar">A</div>
+                <div>
+                    <div class="admin-name">Administrateur</div>
+                    <div class="admin-role">Super Admin</div>
+                </div>
+            </div>
+        </header>
+
+        <section class="content">
+
+            <div class="page-header">
+                <h1>Professeurs</h1>
+                <p>Gérez les professeurs de l'institution.</p>
+            </div>
+
+            <div th:if="${success}" class="alert alert-ok" th:text="${success}"></div>
+
+            <div class="two-col">
+
+                <!-- Liste -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Liste des professeurs</span>
+                        <span class="card-count"
+                              th:text="${#lists.size(teachers)+' prof(s)'}">0</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Email</th>
+                                <th>Téléphone</th>
+                                <th>Statut</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="t : ${teachers}">
+                                <td>
+                                    <div class="td-main"
+                                         th:text="${t.firstName+' '+t.lastName}">Nom</div>
+                                </td>
+                                <td th:text="${t.email ?: '—'}">email</td>
+                                <td th:text="${t.phone ?: '—'}">phone</td>
+                                <td>
+                    <span class="badge"
+                          th:classappend="${t.active?'badge-active':'badge-inactive'}"
+                          th:text="${t.active?'Actif':'Inactif'}">Actif</span>
+                                </td>
+                                <td>
+                                    <a th:href="@{/admin/teachers/delete/{id}(id=${t.id})}"
+                                       class="btn-del"
+                                       onclick="return confirm('Supprimer ce professeur ?')">
+                                        Supprimer
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(teachers)}">
+                                <td colspan="5" class="empty-cell">Aucun professeur enregistré.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Formulaire -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Ajouter un professeur</span>
+                    </div>
+                    <div class="card-body">
+                        <form method="post"
+                              th:action="@{/admin/teachers/save}"
+                              th:object="${teacher}">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Prénom</label>
+                                    <input class="form-input" type="text"
+                                           th:field="*{firstName}" placeholder="Jean" required/>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Nom</label>
+                                    <input class="form-input" type="text"
+                                           th:field="*{lastName}" placeholder="Dupont" required/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input class="form-input" type="email"
+                                       th:field="*{email}" placeholder="prof@ecole.edu"/>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Téléphone</label>
+                                <input class="form-input" type="text"
+                                       th:field="*{phone}" placeholder="+509 xxxx xxxx"/>
+                            </div>
+                            <button type="submit" class="btn-primary">
+                                + Enregistrer le professeur
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

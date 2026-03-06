@@ -1,0 +1,152 @@
+ <!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Notes — UniFlex Professeur</title>
+    <link rel="stylesheet" th:href="@{/css/teacher.css}">
+</head>
+<body>
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="logo">UF</div>
+            <div>
+                <div class="brand-name">UniFlex</div>
+                <div class="brand-sub">Espace Professeur</div>
+            </div>
+        </div>
+
+        <div class="menu-title">Navigation</div>
+        <a class="nav-link" th:href="@{/teacher/dashboard}">
+            <span class="nav-icon">📊</span> Dashboard
+        </a>
+        <a class="nav-link active" href="#">
+            <span class="nav-icon">📝</span> Saisie des notes
+        </a>
+
+        <div class="sidebar-spacer"></div>
+
+        <form th:action="@{/logout}" method="post" class="logout">
+            <button type="submit">⬅ Déconnexion</button>
+        </form>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="topbar-title" th:text="${subject.name}">Matière</div>
+                <div class="topbar-sub"
+                     th:text="${subject.classGroup.name+' · Coef. '+subject.coefficient}">
+                    L3 INFO A · Coef. 2
+                </div>
+            </div>
+            <div class="topbar-right">
+                <a th:href="@{/teacher/dashboard}" class="btn-back">← Retour</a>
+            </div>
+        </header>
+
+        <!-- CONTENT -->
+        <section class="content">
+
+            <div th:if="${success}" class="alert alert-ok" th:text="${success}"></div>
+
+            <div class="two-col">
+
+                <!-- Formulaire saisie -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Saisir une note</span>
+                    </div>
+                    <div class="card-body">
+                        <form method="post"
+                              th:action="@{/teacher/subjects/{id}/grades/save(id=${subject.id})}">
+                            <div class="form-group">
+                                <label class="form-label">Étudiant</label>
+                                <select class="form-select" name="studentId" required>
+                                    <option value="">-- Sélectionner un étudiant --</option>
+                                    <option th:each="s : ${students}"
+                                            th:value="${s.id}"
+                                            th:text="${s.firstName+' '+s.lastName}">
+                                        Étudiant
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Semestre</label>
+                                <select class="form-select" name="term" required>
+                                    <option value="S1">Semestre 1</option>
+                                    <option value="S2">Semestre 2</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Note /20</label>
+                                <input class="form-input" type="number"
+                                       name="value"
+                                       min="0" max="20" step="0.25"
+                                       placeholder="ex : 14.50" required/>
+                            </div>
+                            <button type="submit" class="btn-primary">
+                                + Enregistrer la note
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Notes déjà saisies -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Notes saisies</span>
+                        <span class="card-count"
+                              th:text="${#lists.size(grades)+' note(s)'}">0</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Étudiant</th>
+                                <th>Semestre</th>
+                                <th>Note</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="g : ${grades}">
+                                <td>
+                                    <div class="td-main"
+                                         th:text="${g.student.firstName+' '+g.student.lastName}">
+                                        Nom
+                                    </div>
+                                </td>
+                                <td>
+                    <span class="badge"
+                          th:classappend="${g.term=='S1'?'badge-s1':'badge-s2'}"
+                          th:text="${g.term}">S1</span>
+                                </td>
+                                <td>
+                    <span class="note-chip"
+                          th:classappend="${g.value<10?'note-fail':
+                                           g.value<12?'note-medium':'note-pass'}"
+                          th:text="${#numbers.formatDecimal(g.value,1,2)+'/20'}">
+                      14.00/20
+                    </span>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(grades)}">
+                                <td colspan="3" class="empty-cell">Aucune note saisie.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>UniFlex — Connexion</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+</head>
+<body>
+
+<main class="auth">
+    <section class="card">
+
+        <!-- LEFT -->
+        <div class="left">
+            <div class="brand">
+                <div class="logo">UF</div>
+                <div>
+                    <div class="brand-name">UniFlex</div>
+                    <div class="brand-sub">Portail académique</div>
+                </div>
+            </div>
+
+            <h1>Connexion</h1>
+            <p class="muted">Connecte-toi pour accéder à ton espace.</p>
+
+            <div class="alert error" th:if="${param.error}">
+                Identifiants incorrects.
+            </div>
+            <div class="alert ok" th:if="${param.logout}">
+                Déconnecté avec succès.
+            </div>
+
+            <form class="form" th:action="@{/login}" method="post">
+                <label class="field">
+                    <span>Identifiant</span>
+                    <input type="text" name="username" placeholder="ex: admin" required/>
+                </label>
+
+                <label class="field">
+                    <span>Mot de passe</span>
+                    <div class="pass-wrap">
+                        <input id="pwd" type="password" name="password" placeholder="••••••••" required/>
+                        <button class="eye" type="button" onclick="togglePass()">👁</button>
+                    </div>
+                </label>
+
+                <button class="btn" type="submit">Se connecter →</button>
+            </form>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="right">
+            <div class="bubble">
+                <div class="circle c1"></div>
+                <div class="circle c2"></div>
+                <div class="panel">
+                    <div class="panel-top">
+                        <span class="dot red"></span>
+                        <span class="dot yellow"></span>
+                        <span class="dot green"></span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="avatar"></div>
+                        <div class="lines">
+                            <div class="line w80"></div>
+                            <div class="line w60"></div>
+                        </div>
+                        <div class="row-card">
+                            <div class="mini"></div>
+                            <div class="lines">
+                                <div class="line w70"></div>
+                                <div class="line w40"></div>
+                            </div>
+                        </div>
+                        <div class="row-card">
+                            <div class="mini"></div>
+                            <div class="lines">
+                                <div class="line w75"></div>
+                                <div class="line w50"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h2>Bienvenue sur UniFlex</h2>
+                <p>Gérez notes, matières, professeurs et étudiants facilement.</p>
+            </div>
+        </div>
+
+    </section>
+</main>
+
+<script>
+    function togglePass() {
+      const p = document.getElementById('pwd');
+      p.type = p.type === 'password' ? 'text' : 'password';
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,193 @@
+
+
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Étudiants — UniFlex Admin</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-top">
+            <div class="brand">
+                <div class="logo">UF</div>
+                <div>
+                    <div class="brand-name">UniFlex</div>
+                    <div class="brand-sub">Administration</div>
+                </div>
+            </div>
+            <div class="admin-badge">Admin</div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Principal</div>
+                <a class="nav-link" th:href="@{/admin/dashboard}">
+                    <span class="nav-icon">📊</span> Dashboard
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Gestion</div>
+                <a class="nav-link" th:href="@{/admin/teachers}">
+                    <span class="nav-icon">👨‍🏫</span> Professeurs
+                </a>
+                <a class="nav-link active" th:href="@{/admin/students}">
+                    <span class="nav-icon">👨‍🎓</span> Étudiants
+                </a>
+                <a class="nav-link" th:href="@{/admin/classes}">
+                    <span class="nav-icon">🏫</span> Classes
+                </a>
+                <a class="nav-link" th:href="@{/admin/subjects}">
+                    <span class="nav-icon">📚</span> Matières
+                </a>
+                <a class="nav-link" th:href="@{/admin/grades}">
+                    <span class="nav-icon">📝</span> Notes
+                </a>
+            </div>
+        </nav>
+        <div class="sidebar-bottom">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="logout-btn">⬅ Déconnexion</button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="topbar-title">Étudiants</div>
+                <div class="topbar-breadcrumb">Administration · Gestion des étudiants</div>
+            </div>
+            <div class="topbar-right">
+                <div class="admin-avatar">A</div>
+                <div>
+                    <div class="admin-name">Administrateur</div>
+                    <div class="admin-role">Super Admin</div>
+                </div>
+            </div>
+        </header>
+
+        <section class="content">
+
+            <div class="page-header">
+                <h1>Étudiants</h1>
+                <p>Inscrivez et gérez les étudiants de l'institution.</p>
+            </div>
+
+            <div th:if="${success}" class="alert alert-ok" th:text="${success}"></div>
+
+            <div class="two-col">
+
+                <!-- Liste -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Liste des étudiants</span>
+                        <span class="card-count"
+                              th:text="${#lists.size(students)+' étudiant(s)'}">0</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Nom</th>
+                                <th>Classe</th>
+                                <th>Statut</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="s : ${students}">
+                                <td>
+                    <span style="font-family:monospace;font-size:.8rem;
+                                 background:var(--slate-100);padding:3px 8px;
+                                 border-radius:5px;"
+                          th:text="${s.code}">UF-001</span>
+                                </td>
+                                <td>
+                                    <div class="td-main"
+                                         th:text="${s.firstName+' '+s.lastName}">Nom</div>
+                                </td>
+                                <td th:text="${s.classGroup.name}">L3</td>
+                                <td>
+                    <span class="badge"
+                          th:classappend="${s.active?'badge-active':'badge-inactive'}"
+                          th:text="${s.active?'Actif':'Inactif'}">Actif</span>
+                                </td>
+                                <td>
+                                    <a th:href="@{/admin/students/delete/{id}(id=${s.id})}"
+                                       class="btn-del"
+                                       onclick="return confirm('Supprimer cet étudiant ?')">
+                                        Supprimer
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(students)}">
+                                <td colspan="5" class="empty-cell">Aucun étudiant inscrit.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Formulaire -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Inscrire un étudiant</span>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" th:action="@{/admin/students/save}">
+                            <div class="form-group">
+                                <label class="form-label">Code étudiant</label>
+                                <input class="form-input" type="text"
+                                       name="code" placeholder="UF-2026-001" required/>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Prénom</label>
+                                    <input class="form-input" type="text"
+                                           name="firstName" required/>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Nom</label>
+                                    <input class="form-input" type="text"
+                                           name="lastName" required/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Classe</label>
+                                <select class="form-select" name="classGroupId" required>
+                                    <option value="">-- Sélectionner --</option>
+                                    <option th:each="c : ${classes}"
+                                            th:value="${c.id}"
+                                            th:text="${c.name}">L3</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Identifiant de connexion</label>
+                                <input class="form-input" type="text"
+                                       name="username" placeholder="junior.dupont" required/>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Mot de passe</label>
+                                <input class="form-input" type="password"
+                                       name="password" placeholder="••••••••" required/>
+                            </div>
+                            <button type="submit" class="btn-primary">
+                                + Inscrire l'étudiant
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,181 @@
+
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard — UniFlex Admin</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-top">
+            <div class="brand">
+                <div class="logo">UF</div>
+                <div>
+                    <div class="brand-name">UniFlex</div>
+                    <div class="brand-sub">Administration</div>
+                </div>
+            </div>
+            <div class="admin-badge">Admin</div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Principal</div>
+                <a class="nav-link active" th:href="@{/admin/dashboard}">
+                    <span class="nav-icon">📊</span> Dashboard
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Gestion</div>
+                <a class="nav-link" th:href="@{/admin/teachers}">
+                    <span class="nav-icon">👨‍🏫</span> Professeurs
+                </a>
+                <a class="nav-link" th:href="@{/admin/students}">
+                    <span class="nav-icon">👨‍🎓</span> Étudiants
+                </a>
+                <a class="nav-link" th:href="@{/admin/classes}">
+                    <span class="nav-icon">🏫</span> Classes
+                </a>
+                <a class="nav-link" th:href="@{/admin/subjects}">
+                    <span class="nav-icon">📚</span> Matières
+                </a>
+                <a class="nav-link" th:href="@{/admin/grades}">
+                    <span class="nav-icon">📝</span> Notes
+                </a>
+            </div>
+        </nav>
+        <div class="sidebar-bottom">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="logout-btn">⬅ Déconnexion</button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="topbar-title">Tableau de bord</div>
+                <div class="topbar-breadcrumb">UniFlex · Administration</div>
+            </div>
+            <div class="topbar-right">
+                <div class="admin-avatar">A</div>
+                <div>
+                    <div class="admin-name">Administrateur</div>
+                    <div class="admin-role">Super Admin</div>
+                </div>
+            </div>
+        </header>
+
+        <section class="content">
+
+            <div class="page-header">
+                <h1>Vue d'ensemble</h1>
+                <p>Gérez l'ensemble de l'institution depuis ce tableau de bord.</p>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">👨‍🏫</div>
+                    <div class="stat-value" th:text="${nbTeachers}">0</div>
+                    <div class="stat-label">Professeurs</div>
+                </div>
+                <div class="stat-card s-green">
+                    <div class="stat-icon">👨‍🎓</div>
+                    <div class="stat-value" th:text="${nbStudents}">0</div>
+                    <div class="stat-label">Étudiants</div>
+                </div>
+                <div class="stat-card s-orange">
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-value" th:text="${nbSubjects}">0</div>
+                    <div class="stat-label">Matières</div>
+                </div>
+                <div class="stat-card s-gold">
+                    <div class="stat-icon">🏫</div>
+                    <div class="stat-value" th:text="${nbClasses}">0</div>
+                    <div class="stat-label">Classes</div>
+                </div>
+                <div class="stat-card s-red">
+                    <div class="stat-icon">📝</div>
+                    <div class="stat-value" th:text="${nbGrades}">0</div>
+                    <div class="stat-label">Notes saisies</div>
+                </div>
+            </div>
+
+            <!-- Accès rapides -->
+            <div class="quick-grid">
+                <a th:href="@{/admin/teachers}" class="quick-card">
+                    <div class="quick-card-icon">👨‍🏫</div>
+                    <div><h3>Professeurs</h3><p>Ajouter, modifier, supprimer</p></div>
+                </a>
+                <a th:href="@{/admin/students}" class="quick-card">
+                    <div class="quick-card-icon">👨‍🎓</div>
+                    <div><h3>Étudiants</h3><p>Inscrire et gérer</p></div>
+                </a>
+                <a th:href="@{/admin/subjects}" class="quick-card">
+                    <div class="quick-card-icon">📚</div>
+                    <div><h3>Matières</h3><p>Assigner profs et classes</p></div>
+                </a>
+                <a th:href="@{/admin/grades}" class="quick-card">
+                    <div class="quick-card-icon">📝</div>
+                    <div><h3>Notes</h3><p>Saisir et modifier</p></div>
+                </a>
+            </div>
+
+            <!-- Dernières notes -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Dernières notes saisies</span>
+                    <a th:href="@{/admin/grades}"
+                       style="font-size:.8rem;color:var(--accent);text-decoration:none;font-weight:600;">
+                        Voir tout →
+                    </a>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Étudiant</th>
+                            <th>Matière</th>
+                            <th>Semestre</th>
+                            <th>Note</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="g : ${recentGrades}">
+                            <td>
+                                <div class="td-main"
+                                     th:text="${g.student.firstName+' '+g.student.lastName}">Nom</div>
+                                <div class="td-sub"
+                                     th:text="${g.student.classGroup.name}">Classe</div>
+                            </td>
+                            <td th:text="${g.subject.name}">Matière</td>
+                            <td>
+                  <span class="badge"
+                        th:classappend="${g.term=='S1'?'badge-s1':'badge-s2'}"
+                        th:text="${g.term}">S1</span>
+                            </td>
+                            <td>
+                  <span class="note-chip"
+                        th:classappend="${g.value<10?'note-fail':g.value<12?'note-medium':'note-pass'}"
+                        th:text="${#numbers.formatDecimal(g.value,1,2)+'/20'}">14/20</span>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(recentGrades)}">
+                            <td colspan="4" class="empty-cell">Aucune note saisie.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+    </main>
+</div>
+</body>
+</html>

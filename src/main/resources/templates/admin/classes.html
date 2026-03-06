@@ -1,0 +1,162 @@
+
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Classes — UniFlex Admin</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-top">
+            <div class="brand">
+                <div class="logo">UF</div>
+                <div>
+                    <div class="brand-name">UniFlex</div>
+                    <div class="brand-sub">Administration</div>
+                </div>
+            </div>
+            <div class="admin-badge">Admin</div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Principal</div>
+                <a class="nav-link" th:href="@{/admin/dashboard}">
+                    <span class="nav-icon">📊</span> Dashboard
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Gestion</div>
+                <a class="nav-link" th:href="@{/admin/teachers}">
+                    <span class="nav-icon">👨‍🏫</span> Professeurs
+                </a>
+                <a class="nav-link" th:href="@{/admin/students}">
+                    <span class="nav-icon">👨‍🎓</span> Étudiants
+                </a>
+                <a class="nav-link active" th:href="@{/admin/classes}">
+                    <span class="nav-icon">🏫</span> Classes
+                </a>
+                <a class="nav-link" th:href="@{/admin/subjects}">
+                    <span class="nav-icon">📚</span> Matières
+                </a>
+                <a class="nav-link" th:href="@{/admin/grades}">
+                    <span class="nav-icon">📝</span> Notes
+                </a>
+            </div>
+        </nav>
+        <div class="sidebar-bottom">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="logout-btn">⬅ Déconnexion</button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="topbar-title">Classes</div>
+                <div class="topbar-breadcrumb">Administration · Gestion des classes</div>
+            </div>
+            <div class="topbar-right">
+                <div class="admin-avatar">A</div>
+                <div>
+                    <div class="admin-name">Administrateur</div>
+                    <div class="admin-role">Super Admin</div>
+                </div>
+            </div>
+        </header>
+
+        <section class="content">
+
+            <div class="page-header">
+                <h1>Classes</h1>
+                <p>Créez et gérez les groupes de classe.</p>
+            </div>
+
+            <div th:if="${success}" class="alert alert-ok" th:text="${success}"></div>
+
+            <div class="two-col">
+
+                <!-- Liste -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Liste des classes</span>
+                        <span class="card-count"
+                              th:text="${#lists.size(classes)+' classe(s)'}">0</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Année académique</th>
+                                <th>Statut</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="c : ${classes}">
+                                <td>
+                                    <div class="td-main" th:text="${c.name}">L3 INFO A</div>
+                                </td>
+                                <td th:text="${c.academicYear}">2025-2026</td>
+                                <td>
+                    <span class="badge"
+                          th:classappend="${c.active?'badge-active':'badge-inactive'}"
+                          th:text="${c.active?'Active':'Inactive'}">Active</span>
+                                </td>
+                                <td>
+                                    <a th:href="@{/admin/classes/delete/{id}(id=${c.id})}"
+                                       class="btn-del"
+                                       onclick="return confirm('Supprimer cette classe ?')">
+                                        Supprimer
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(classes)}">
+                                <td colspan="4" class="empty-cell">Aucune classe créée.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Formulaire -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Créer une classe</span>
+                    </div>
+                    <div class="card-body">
+                        <form method="post"
+                              th:action="@{/admin/classes/save}"
+                              th:object="${classGroup}">
+                            <div class="form-group">
+                                <label class="form-label">Nom de la classe</label>
+                                <input class="form-input" type="text"
+                                       th:field="*{name}"
+                                       placeholder="ex : L3 INFO A" required/>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Année académique</label>
+                                <input class="form-input" type="text"
+                                       th:field="*{academicYear}"
+                                       placeholder="2025-2026" required/>
+                            </div>
+                            <button type="submit" class="btn-primary">
+                                + Créer la classe
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

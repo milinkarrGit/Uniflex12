@@ -1,0 +1,84 @@
+
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard — UniFlex Professeur</title>
+    <link rel="stylesheet" th:href="@{/css/teacher.css}">
+</head>
+<body>
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="logo">UF</div>
+            <div>
+                <div class="brand-name">UniFlex</div>
+                <div class="brand-sub">Espace Professeur</div>
+            </div>
+        </div>
+
+        <div class="menu-title">Navigation</div>
+        <a class="nav-link active" th:href="@{/teacher/dashboard}">
+            <span class="nav-icon">📊</span> Dashboard
+        </a>
+
+        <div class="sidebar-spacer"></div>
+
+        <form th:action="@{/logout}" method="post" class="logout">
+            <button type="submit">⬅ Déconnexion</button>
+        </form>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="topbar-title">Mes Matières</div>
+                <div class="topbar-sub" th:text="${username}">prof@ecole.edu</div>
+            </div>
+            <div class="topbar-right">
+                <div class="user-avatar">P</div>
+                <div class="user-name" th:text="${username}">Professeur</div>
+            </div>
+        </header>
+
+        <!-- CONTENT -->
+        <section class="content">
+
+            <div class="page-header">
+                <h1>Bonjour 👋</h1>
+                <p>Voici vos matières assignées. Cliquez sur une matière pour saisir les notes.</p>
+            </div>
+
+            <!-- Matières -->
+            <div class="subjects-grid">
+                <div th:each="s : ${subjects}" class="subject-card">
+                    <div class="subject-icon">📚</div>
+                    <div class="subject-name" th:text="${s.name}">Java</div>
+                    <div class="subject-class" th:text="${s.classGroup.name}">L3 INFO A</div>
+                    <div class="subject-coef">
+                        Coefficient : <strong th:text="${s.coefficient}">2</strong>
+                    </div>
+                    <a th:href="@{/teacher/subjects/{id}/grades(id=${s.id})}"
+                       class="subject-btn">
+                        Saisir les notes →
+                    </a>
+                </div>
+
+                <div th:if="${#lists.isEmpty(subjects)}" class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <p>Aucune matière assignée pour le moment.</p>
+                    <span>Contactez l'administrateur.</span>
+                </div>
+            </div>
+
+        </section>
+    </main>
+</div>
+</body>
+</html>

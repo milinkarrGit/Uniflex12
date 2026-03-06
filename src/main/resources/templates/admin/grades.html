@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Notes — UniFlex Admin</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-top">
+            <div class="brand">
+                <div class="logo">UF</div>
+                <div>
+                    <div class="brand-name">UniFlex</div>
+                    <div class="brand-sub">Administration</div>
+                </div>
+            </div>
+            <div class="admin-badge">Admin</div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Principal</div>
+                <a class="nav-link" th:href="@{/admin/dashboard}">
+                    <span class="nav-icon">📊</span> Dashboard
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Gestion</div>
+                <a class="nav-link" th:href="@{/admin/teachers}">
+                    <span class="nav-icon">👨‍🏫</span> Professeurs
+                </a>
+                <a class="nav-link" th:href="@{/admin/students}">
+                    <span class="nav-icon">👨‍🎓</span> Étudiants
+                </a>
+                <a class="nav-link" th:href="@{/admin/classes}">
+                    <span class="nav-icon">🏫</span> Classes
+                </a>
+                <a class="nav-link" th:href="@{/admin/subjects}">
+                    <span class="nav-icon">📚</span> Matières
+                </a>
+                <a class="nav-link active" th:href="@{/admin/grades}">
+                    <span class="nav-icon">📝</span> Notes
+                </a>
+            </div>
+        </nav>
+        <div class="sidebar-bottom">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="logout-btn">⬅ Déconnexion</button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="topbar-title">Notes</div>
+                <div class="topbar-breadcrumb">Administration · Saisie des notes</div>
+            </div>
+            <div class="topbar-right">
+                <div class="admin-avatar">A</div>
+                <div>
+                    <div class="admin-name">Administrateur</div>
+                    <div class="admin-role">Super Admin</div>
+                </div>
+            </div>
+        </header>
+
+        <section class="content">
+
+            <div class="page-header">
+                <h1>Notes</h1>
+                <p>Saisissez et gérez les notes des étudiants.</p>
+            </div>
+
+            <div th:if="${success}" class="alert alert-ok" th:text="${success}"></div>
+
+            <div class="two-col">
+
+                <!-- Liste -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Toutes les notes</span>
+                        <span class="card-count"
+                              th:text="${#lists.size(grades)+' note(s)'}">0</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Étudiant</th>
+                                <th>Matière</th>
+                                <th>Semestre</th>
+                                <th>Note</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="g : ${grades}">
+                                <td>
+                                    <div class="td-main"
+                                         th:text="${g.student.firstName+' '+g.student.lastName}">Nom</div>
+                                    <div class="td-sub"
+                                         th:text="${g.student.classGroup.name}">Classe</div>
+                                </td>
+                                <td th:text="${g.subject.name}">Java</td>
+                                <td>
+                    <span class="badge"
+                          th:classappend="${g.term=='S1'?'badge-s1':'badge-s2'}"
+                          th:text="${g.term}">S1</span>
+                                </td>
+                                <td>
+                    <span class="note-chip"
+                          th:classappend="${g.value<10?'note-fail':
+                                           g.value<12?'note-medium':'note-pass'}"
+                          th:text="${#numbers.formatDecimal(g.value,1,2)+'/20'}">
+                      14.00/20
+                    </span>
+                                </td>
+                                <td>
+                                    <a th:href="@{/admin/grades/delete/{id}(id=${g.id})}"
+                                       class="btn-del"
+                                       onclick="return confirm('Supprimer cette note ?')">
+                                        Supprimer
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(grades)}">
+                                <td colspan="5" class="empty-cell">Aucune note saisie.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Formulaire -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Saisir une note</span>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" th:action="@{/admin/grades/save}">
+                            <div class="form-group">
+                                <label class="form-label">Étudiant</label>
+                                <select class="form-select" name="studentId" required>
+                                    <option value="">-- Sélectionner --</option>
+                                    <option th:each="s : ${students}"
+                                            th:value="${s.id}"
+                                            th:text="${s.firstName+' '+s.lastName+' ('+s.code+')'}">
+                                        Étudiant
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Matière</label>
+                                <select class="form-select" name="subjectId" required>
+                                    <option value="">-- Sélectionner --</option>
+                                    <option th:each="s : ${subjects}"
+                                            th:value="${s.id}"
+                                            th:text="${s.name+' – '+s.classGroup.name}">
+                                        Matière
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Semestre</label>
+                                    <select class="form-select" name="term" required>
+                                        <option value="S1">Semestre 1</option>
+                                        <option value="S2">Semestre 2</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Note /20</label>
+                                    <input class="form-input" type="number"
+                                           name="value"
+                                           min="0" max="20" step="0.25"
+                                           placeholder="14.00" required/>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary">
+                                + Enregistrer la note
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>
+
