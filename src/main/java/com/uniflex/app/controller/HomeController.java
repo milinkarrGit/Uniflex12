@@ -19,7 +19,7 @@ public class HomeController {
     }
 
 
-    @GetMapping("/")
+    @GetMapping("/test")
     @ResponseBody
     public String test() {
         return "ok test";
