@@ -39,4 +39,11 @@ public class HomeController {
     public String login() {
         return "login";
     }
+
+    
+    @GetMapping("/")
+    @ResponseBody
+    public String test(){
+        return "ok App RUNNING";
+    }
 }
