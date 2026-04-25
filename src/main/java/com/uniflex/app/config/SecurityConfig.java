@@ -37,16 +37,20 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authenticationProvider(authProvider())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/js/**", "/img/**", "/login").permitAll()
-                        .requestMatchers("/student/**").hasRole("STUDENT")
-                        .requestMatchers("/teacher/**").hasRole("TEACHER")
+                        // pages publiques
+                        .requestMatchers("/", "/login", "/css/**", "/js/**", "/img/**").permitAll()
+
+                        // dashboards accessibles après login
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/teacher/**").hasRole("TEACHER")
+                        .requestMatchers("/student/**").hasRole("STUDENT")
+
                         .anyRequest().authenticated()
                 )
                 .formLogin(f -> f
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/", false)
+                        .defaultSuccessUrl("/", true)
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
@@ -58,3 +62,5 @@ public class SecurityConfig {
         return http.build();
     }
 }
+
+
