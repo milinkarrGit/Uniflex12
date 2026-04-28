@@ -36,6 +36,14 @@ public class UniflexApplication {
                 userRepo.save(u);
                 System.out.println("✅ Prof créé : prof / prof123");
             }
+            if (userRepo.findByUsername("jean").isEmpty()) {
+                User u = new User();
+                u.setUsername("jean");
+                u.setPassword(encoder.encode("jean12"));
+                u.setRole("ROLE_STUDENT");
+                userRepo.save(u);
+                System.out.println("✅ jean créé : prof / jean12");
+            }
         };
     }
 }
